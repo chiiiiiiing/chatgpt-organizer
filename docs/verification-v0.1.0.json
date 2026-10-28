@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-28",
+  "timezone": "Asia/Shanghai",
+  "version": "0.1.0",
+  "extensionId": "agkjfdlffbijhaogmnekcfpkddnfihib",
+  "build": {
+    "typescript": "passed",
+    "vite": "passed"
+  },
+  "unitTests": {
+    "passed": 34,
+    "failed": 0
+  },
+  "browserTests": [
+    {
+      "browser": "Chrome for Testing",
+      "version": "156.0.8078.4",
+      "fixture": true,
+      "scenariosPassed": 4
+    },
+    {
+      "browser": "Microsoft Edge",
+      "version": "156.0.4314.42",
+      "fixture": true,
+      "scenariosPassed": 4,
+      "finalBuildClassificationBackupSmoke": "passed"
+    }
+  ],
+  "visualInspection": [
+    "light",
+    "dark",
+    "narrow",
+    "settings"
+  ],
+  "notVerified": [
+    "Live authenticated ChatGPT DOM",
+    "Chrome account sync across two devices",
+    "Edge account sync across two devices"
+  ],
+  "archive": {
+    "path": "release/chatgpt-organizer-0.1.0.zip",
+    "sizeBytes": 34270,
+    "sha256": "382f0db76456ab89f486d731973ffead0dc80fae15bab54c9952a48b5783cfe6",
+    "integrity": "passed"
+  },
+  "buildFiles": {
+    "assets/settings-BFA4LNgI.css": "4bcebbf8873b337cd087019c648408ed41e67407524f0e9a8e6d8e5d3d8dcbad",
+    "background.js": "d25824991f57faf9dcc80f0763af055774bf651d68f5fcae3a8de13f2be29ccc",
+    "content.js": "2a524eece333158d16861b149f014dfe01121a3f3041837bada22c03d1706303",
+    "icons/icon128.png": "04f2a18242205a2475abb7da2a9ed14731c6473ffde1e6b7132614c2c4a620cc",
+    "icons/icon16.png": "4af4d8a180f92a63d2d25bf9c2236828a833e2555f8656bf2b568f6aa91e8752",
+    "icons/icon32.png": "70cb97e70e0ea69ad0525f27ba5b60a9199b8cb4d88c3bff2bc385c97b8472a0",
+    "icons/icon48.png": "95cdd56065126263d8fcbc6d4b3364334c6e99f840fb2a4a5d998dfa599efab5",
+    "manifest.json": "b0d044da47b36572b0eaca96cf280daa83e1bb57a89de3a21cbee6d919eec63c",
+    "settings.html": "15d9fa940e68442e97a2f2188be9be99760a1ba0308a5e1808ce47be5ca2c2c5",
+    "settings.js": "2161638d82aca35790cbca4f81092fc6b053ce3dbb658a6bf31445819e2feacb"
+  }
+}
