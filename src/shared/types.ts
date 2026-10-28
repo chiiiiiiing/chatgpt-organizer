@@ -54,6 +54,7 @@ export interface Turn {
 export interface PageSnapshot {
   conversationId: string | null; title: string; turns: Turn[];
   conversations: ConversationRef[]; sidebar: HTMLElement | null;
+  sidebarRegion?: HTMLElement | null;
   readingRoot: HTMLElement | null;
   scrollContainer: HTMLElement | null; dark: boolean;
 }

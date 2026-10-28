@@ -150,6 +150,122 @@ test('native chat drag, nested folders, themes, narrow layout and visual artifac
   await settings.screenshot({ path: test.info().outputPath('settings.png'), fullPage: true });
 });
 
+test('collapsed native sidebar remains clickable beside the organizer launcher and floating panel', async () => {
+  await folder('侧栏回归测试');
+  await page.evaluate(() => {
+    document.documentElement.classList.add('dark');
+    const style = document.createElement('style');
+    style.textContent = `
+      body { --test-rail-width: 64px; }
+      #stage-sidebar-tiny { display: none; }
+      body.test-collapsed > aside { display: none; }
+      body.test-collapsed #stage-sidebar-tiny {
+        display: block; position: fixed; inset: 0 auto 0 0;
+        width: var(--test-rail-width); transition: width 300ms linear;
+        background: var(--sidebar-surface-primary); border-right: 1px solid var(--border-light);
+      }
+      #stage-sidebar-tiny button {
+        position: absolute; left: calc(50% - 20px); width: 40px; height: 40px;
+        padding: 0; border: 0; border-radius: 8px; color: var(--text-primary);
+        background: var(--sidebar-surface-secondary); font-size: 20px;
+      }
+      body.test-collapsed > header { left: var(--test-rail-width); }
+      body.test-collapsed > main { margin-left: var(--test-rail-width); }
+      body.test-collapsed > .composer {
+        left: calc(var(--test-rail-width) + (100vw - var(--test-rail-width)) / 2);
+        width: min(640px, calc(100vw - var(--test-rail-width) - 40px));
+      }
+    `;
+    document.head.append(style);
+    const rail = document.createElement('nav');
+    rail.id = 'stage-sidebar-tiny';
+    rail.setAttribute('aria-label', '原生收起侧栏');
+    for (const [index, label] of ['原生新聊天', '原生历史记录'].entries()) {
+      const button = document.createElement('button');
+      button.setAttribute('aria-label', label);
+      button.textContent = index ? '◷' : '＋';
+      button.style.top = `${76 + index * 48}px`;
+      button.dataset.clicks = '0';
+      button.addEventListener('click', () => { button.dataset.clicks = String(Number(button.dataset.clicks) + 1); });
+      rail.append(button);
+    }
+    document.body.append(rail);
+    document.body.classList.add('test-collapsed');
+  });
+
+  const launcher = page.getByRole('button', { name: /^(打开|关闭)整理面板$/ });
+  const panel = page.locator('[data-cgo-root="organizer"]');
+  let nativeClicks = 0;
+  async function checkNativeButtons() {
+    nativeClicks++;
+    for (const name of ['原生新聊天', '原生历史记录']) {
+      const control = page.getByRole('button', { name, exact: true });
+      await control.click({ timeout: 5000 });
+      await expect(control).toHaveAttribute('data-clicks', String(nativeClicks));
+    }
+  }
+  async function checkFloatingGeometry() {
+    await expect(panel).toBeVisible();
+    await expect.poll(() => page.evaluate(() => {
+      const rail = document.querySelector('#stage-sidebar-tiny')!.getBoundingClientRect();
+      const launcher = document.querySelector('[data-cgo-root="utility"]')!.shadowRoot!.querySelector('button')!.getBoundingClientRect();
+      const panel = document.querySelector('[data-cgo-root="organizer"]')!.getBoundingClientRect();
+      const composer = document.querySelector('.composer')!.getBoundingClientRect();
+      return {
+        launcherOutsideRail: launcher.left >= rail.right + 6,
+        panelOutsideRail: panel.left >= rail.right + 6,
+        aligned: Math.abs(launcher.left - panel.left) <= 1,
+        launcherInViewport: launcher.left >= 0 && launcher.right <= innerWidth && launcher.top >= 0 && launcher.bottom <= innerHeight,
+        panelInViewport: panel.left >= 0 && panel.right <= innerWidth && panel.top >= 0 && panel.bottom <= innerHeight,
+        composerClear: panel.bottom <= composer.top - 4,
+        noHorizontalOverflow: document.documentElement.scrollWidth <= innerWidth,
+      };
+    })).toEqual({
+      launcherOutsideRail: true, panelOutsideRail: true, aligned: true,
+      launcherInViewport: true, panelInViewport: true, composerClear: true, noHorizontalOverflow: true,
+    });
+  }
+
+  await expect(page.getByRole('button', { name: '打开整理面板', exact: true })).toBeVisible();
+  await checkNativeButtons();
+  await launcher.click();
+  await expect(page.getByRole('button', { name: '关闭整理面板', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '侧栏回归测试 文件夹操作' })).toBeVisible();
+  await checkFloatingGeometry();
+  await checkNativeButtons();
+  await page.screenshot({ path: test.info().outputPath('collapsed-sidebar.png'), fullPage: true });
+
+  // Width changes after the initial DOM mutation must be tracked through the transition.
+  await page.evaluate(() => document.body.style.setProperty('--test-rail-width', '84px'));
+  await expect.poll(() => page.locator('#stage-sidebar-tiny').evaluate(el => Math.abs(el.getBoundingClientRect().width - 84) < 0.1)).toBe(true);
+  await checkFloatingGeometry();
+  await launcher.click();
+  await expect(panel).toBeHidden();
+  await checkNativeButtons();
+
+  await page.evaluate(() => { document.body.classList.remove('test-collapsed'); });
+  await expect(launcher).toBeHidden();
+  await expect(page.locator('#history > [data-cgo-root="organizer"]')).toBeVisible();
+  await page.evaluate(() => { document.body.classList.add('test-collapsed'); });
+  await expect(page.getByRole('button', { name: '打开整理面板', exact: true })).toBeVisible();
+  await expect(panel).toBeHidden();
+  await launcher.click();
+  await checkFloatingGeometry();
+
+  for (const viewport of [{ width: 800, height: 900 }, { width: 390, height: 600 }, { width: 390, height: 360 }]) {
+    await page.setViewportSize(viewport);
+    await checkFloatingGeometry();
+    await checkNativeButtons();
+    const composer = page.getByRole('textbox', { name: '原生消息输入框' });
+    await composer.fill(`仍可输入 ${viewport.width} × ${viewport.height}`);
+    await expect(composer).toHaveValue(`仍可输入 ${viewport.width} × ${viewport.height}`);
+  }
+  await page.screenshot({ path: test.info().outputPath('collapsed-sidebar-short.png'), fullPage: true });
+  await page.keyboard.press('Escape');
+  await expect(panel).toBeHidden();
+  await expect(page.getByRole('button', { name: '打开整理面板', exact: true })).toBeVisible();
+});
+
 test('long timeline retains scroll and hover during streaming, unloaded turns disappear', async () => {
   await page.evaluate(() => {
     document.querySelector('.thread')!.innerHTML = Array.from({ length: 100 }, (_, i) => `<article data-turn="user"><div data-message-author-role="user" data-message-id="long-u${i}">第${i + 1}轮的重复问题</div></article><article data-turn="assistant"><div data-message-author-role="assistant" data-message-id="long-a${i}">这是第${i + 1}轮的回答。</div></article>`).join('');

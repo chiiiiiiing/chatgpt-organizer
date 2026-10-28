@@ -3,6 +3,7 @@ import type { PageSnapshot, Snapshot } from '../shared/types';
 import { observePage, readPage } from './adapter';
 import { Organizer } from './organizer';
 import { Timeline } from './timeline';
+import utilityCSS from './utility.css?inline';
 
 const singleton = '__chatgptOrganizerCleanup';
 const world = globalThis as typeof globalThis & { [singleton]?: () => void };
@@ -15,8 +16,9 @@ function host(name: string) {
 const organizerHost = host('organizer'), timelineHost = host('timeline'), utilityHost = host('utility');
 document.body.append(organizerHost.node, timelineHost.node, utilityHost.node);
 const utilityStyle = document.createElement('style');
-utilityStyle.textContent = `:host{all:initial;--utility-bg:var(--bg-primary,var(--main-surface-primary,#fff));--utility-ink:var(--text-primary,#171717);--utility-line:var(--border-light,rgb(0 0 0 / 10%));font:12px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}[hidden]{display:none!important}button{font:inherit;cursor:pointer;position:fixed;left:14px;top:76px;z-index:10001;background:var(--utility-bg);color:var(--utility-ink);border:1px solid var(--utility-line);border-radius:10px;padding:8px 12px;box-shadow:0 2px 14px #00000012}button:focus-visible{outline:2px solid var(--utility-ink);outline-offset:3px}.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:130px;z-index:2147483646;padding:12px 20px;border-radius:12px;background:var(--utility-ink);color:var(--utility-bg);box-shadow:0 4px 30px #0002;max-width:min(580px,85vw);text-align:center;font-size:12px;line-height:1.7}:host([data-theme=dark]){--utility-bg:var(--bg-primary,var(--main-surface-primary,#212121));--utility-ink:var(--text-primary,#ececec);--utility-line:var(--border-light,rgb(255 255 255 / 12%))}`;
-const floating = document.createElement('button'); floating.textContent = '▱ 整理'; floating.setAttribute('aria-label', '打开整理面板'); floating.hidden = true;
+utilityStyle.textContent = utilityCSS;
+const floating = document.createElement('button'); floating.className = 'launcher'; floating.type = 'button'; floating.hidden = true;
+floating.innerHTML = '<svg class="folder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M3 10h18"/></svg><svg class="close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>';
 const notice = document.createElement('div'); notice.className = 'toast'; notice.setAttribute('role', 'status'); notice.hidden = true;
 utilityHost.shadow.append(utilityStyle, floating, notice);
 let noticeTimer: ReturnType<typeof setTimeout>;
@@ -33,6 +35,25 @@ let port: chrome.runtime.Port | null = null, reconnectTimer: ReturnType<typeof s
 const events = new AbortController();
 let insetRoot: HTMLElement | null = null;
 let originalPadding = '', originalPriority = '', appliedPadding = '';
+let layoutFrame = 0;
+let layoutTargets: HTMLElement[] = [];
+const layoutObserver = new ResizeObserver(() => scheduleMount());
+function scheduleMount() {
+  if (stopped || layoutFrame) return;
+  layoutFrame = requestAnimationFrame(() => { layoutFrame = 0; mount(); });
+}
+function observeLayout() {
+  const targets = [...new Set([page.sidebarRegion, page.sidebar, page.readingRoot].filter((node): node is HTMLElement => !!node))];
+  if (targets.length === layoutTargets.length && targets.every((node, i) => node === layoutTargets[i])) return;
+  layoutObserver.disconnect(); layoutTargets = targets;
+  for (const target of targets) layoutObserver.observe(target);
+}
+function onScreenRect(node: HTMLElement | null | undefined) {
+  if (!node?.isConnected) return null;
+  const rect = node.getBoundingClientRect(), style = getComputedStyle(node);
+  return style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0 && rect.right > 0
+    && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight ? rect : null;
+}
 function releaseInset() {
   if (insetRoot?.style.getPropertyValue('padding-inline-end') === appliedPadding) {
     if (originalPadding) insetRoot.style.setProperty('padding-inline-end', originalPadding, originalPriority);
@@ -59,20 +80,32 @@ function updateInset() {
 
 function mount() {
   if (stopped) return;
+  observeLayout();
   const sidebar = page.sidebar;
-  const rect = sidebar?.getBoundingClientRect();
-  const inSidebar = sidebar?.isConnected && rect && rect.width >= 130 && rect.right > 0
-    && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight;
-  if (inSidebar) {
+  const rect = onScreenRect(sidebar), region = onScreenRect(page.sidebarRegion);
+  const inSidebar = rect && rect.width >= 130 && (!region || region.width >= 130);
+  if (inSidebar && sidebar) {
     if (organizerHost.node.parentElement !== sidebar) sidebar.prepend(organizerHost.node);
     organizerHost.node.style.cssText = 'display:block;position:relative;width:calc(100% - 12px);max-width:100%;margin:8px 6px 12px;flex-shrink:0;';
     floating.hidden = true; floatingOpen = false;
   } else {
     if (organizerHost.node.parentElement !== document.body) document.body.append(organizerHost.node);
-    organizerHost.node.style.cssText = `display:${floatingOpen ? 'block' : 'none'};position:fixed;left:14px;top:120px;width:min(300px,calc(100vw - 72px));max-height:calc(100vh - 270px);overflow:auto;z-index:10000;border-radius:14px;box-shadow:0 8px 36px #0002;`;
-    floating.hidden = false; floating.textContent = floatingOpen ? '× 收起整理' : '▱ 整理';
-    floating.setAttribute('aria-label', floatingOpen ? '关闭整理面板' : '打开整理面板');
+    // A collapsed native sidebar still contains clickable icons. Keep both the
+    // launcher and its panel outside that rail, including during width changes.
+    const mainLeft = onScreenRect(page.readingRoot)?.left ?? 0;
+    const boundary = region?.right ?? (mainLeft > 0 && mainLeft < 130 ? mainLeft : 0);
+    const left = Math.max(8, Math.min(Math.ceil(boundary) + 8, innerWidth - 48));
+    const top = Math.min(76, Math.max(8, innerHeight - 230));
+    const panelTop = top + 48, width = Math.max(0, Math.min(300, innerWidth - left - 8));
+    const maxHeight = Math.max(0, innerHeight - panelTop - 150);
+    floating.style.setProperty('--launcher-left', `${left}px`);
+    floating.style.setProperty('--launcher-top', `${top}px`);
+    organizerHost.node.style.cssText = `display:${floatingOpen ? 'block' : 'none'};position:fixed;left:${left}px;top:${panelTop}px;width:${width}px;max-height:${maxHeight}px;overflow:auto;z-index:10000;border-radius:14px;box-shadow:0 8px 36px #0002;`;
+    floating.hidden = false;
   }
+  floating.title = floatingOpen ? '关闭整理面板' : '打开整理面板';
+  floating.setAttribute('aria-label', floating.title);
+  floating.setAttribute('aria-expanded', String(floatingOpen));
   for (const item of [timelineHost, utilityHost]) if (!item.node.isConnected) document.body.append(item.node);
   for (const item of [organizerHost, timelineHost, utilityHost]) item.node.dataset.theme = page.dark ? 'dark' : 'light';
   updateInset();
@@ -84,7 +117,9 @@ function render() {
 }
 floating.onclick = () => { floatingOpen = !floatingOpen; mount(); };
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && floatingOpen) { floatingOpen = false; mount(); }
+  if (event.key === 'Escape' && floatingOpen && !organizerHost.shadow.querySelector('dialog[open]')) {
+    floatingOpen = false; mount(); floating.focus();
+  }
 }, { signal: events.signal });
 
 async function refresh() {
@@ -123,10 +158,11 @@ function connect() {
   } catch { /* Extension reload invalidates old content scripts; a page refresh reconnects. */ }
 }
 window.addEventListener('focus', () => void refresh(), { signal: events.signal });
-window.addEventListener('resize', mount, { passive: true, signal: events.signal });
+window.addEventListener('resize', scheduleMount, { passive: true, signal: events.signal });
 connect(); void refresh();
 world[singleton] = () => {
   stopped = true; stopObserver(); events.abort(); clearTimeout(noticeTimer); clearTimeout(reconnectTimer);
+  layoutObserver.disconnect(); cancelAnimationFrame(layoutFrame);
   releaseInset();
   port?.disconnect(); organizer.destroy(); timeline.destroy();
   for (const item of [organizerHost, timelineHost, utilityHost]) item.node.remove();

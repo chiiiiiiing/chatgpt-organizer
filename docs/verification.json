@@ -1,20 +1,40 @@
 {
   "date": "2026-10-28",
   "timezone": "Asia/Shanghai",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "extensionId": "agkjfdlffbijhaogmnekcfpkddnfihib",
-  "change": "Inherit native page colors with neutral fallbacks; remove green styling",
+  "change": "Keep the compact organizer launcher and floating panel outside the collapsed native sidebar",
   "build": {
     "typescript": "passed",
     "vite": "passed"
   },
+  "unitTests": {
+    "passed": 34,
+    "total": 34
+  },
+  "regressionReproducedOn": "0.1.1: utility overlay intercepted clicks on the native new-chat button",
   "browserTests": [
     {
       "browser": "Chrome for Testing",
       "version": "156.0.8078.4",
+      "extensionId": "agkjfdlffbijhaogmnekcfpkddnfihib",
       "fixture": true,
-      "scenariosPassed": 1,
-      "scenario": "native chat drag, nested folders, themes, narrow layout and visual artifacts"
+      "scenariosPassed": 2,
+      "scenarios": [
+        "native drag, nested folders, themes and narrow layout",
+        "collapsed sidebar, native button clicks, width transitions, viewport bounds and normal composer access"
+      ]
+    },
+    {
+      "browser": "Microsoft Edge",
+      "version": "156.0.4314.42",
+      "extensionId": "agkjfdlffbijhaogmnekcfpkddnfihib",
+      "fixture": true,
+      "scenariosPassed": 2,
+      "scenarios": [
+        "native drag, nested folders, themes and narrow layout",
+        "collapsed sidebar, native button clicks, width transitions, viewport bounds and normal composer access"
+      ]
     }
   ],
   "baselineVerification": "verification-v0.1.0.json",
@@ -24,20 +44,20 @@
     "Edge account sync across two devices"
   ],
   "archive": {
-    "path": "release/chatgpt-organizer-0.1.1.zip",
-    "sizeBytes": 34214,
-    "sha256": "63f3821bb44aabbf099173b01f5276cae01e2327b91db5cd7ce0bf631f991aec",
+    "path": "release/chatgpt-organizer-0.1.2.zip",
+    "sizeBytes": 34994,
+    "sha256": "7ef166b9d39c442d04cd456026697167cd1ee614d0b0a1344e60479826d5a34e",
     "integrity": "passed"
   },
   "buildFiles": {
     "assets/settings-C2iHGiTW.css": "8fb9b3b9b271a4ae7a119b3b9acc17ee0f66ebdd322683030bdaae60e38dca24",
     "background.js": "d25824991f57faf9dcc80f0763af055774bf651d68f5fcae3a8de13f2be29ccc",
-    "content.js": "7b31acf85f3cf14a81d56da7de94f896eacdb6860c3748f5a02b15e85d9a73a2",
+    "content.js": "a4d5730b625a40aee202a3c8f2ed5737fad650f974bfd287c2dd0588281d753b",
     "icons/icon128.png": "5ead81ad75f5612a77294815747bf8c4ed2f9882585109533d593397e74c0ec5",
     "icons/icon16.png": "dc722e365ef05baae09620484e6771b6f7a9d36ebf49ffeaf5037456bd3c9674",
     "icons/icon32.png": "125158c633b432b815f40e2eeada181f5b6f855682ec904cdc9611b75721a293",
     "icons/icon48.png": "9837ddaddab05ec951a2cba02c72563c55b6750898f319498b4d1642afaa741a",
-    "manifest.json": "8b339b87338cd412dd463e7c40fd109c49937a4c478dd9eaa7067699c65ba312",
+    "manifest.json": "5c1c3760b8b6df39e33c3f8256c06f7fbe58a6fc6126e377c85ebde9d629f230",
     "settings.html": "8eea9c6fcb2a085b68b6f2f8c467fdc202c6b2d0bb3709e51906c2ad44cf0bd9",
     "settings.js": "420a112eda314bedaa4856e0afeabe1b742e8fc5431e6f9c42b8a4b1dd384fcc"
   }

@@ -6,7 +6,7 @@ const SELECTORS = {
   main: 'main, [role="main"]',
   messages: '[data-message-author-role="user"], [data-message-author-role="assistant"], article[data-turn="user"], article[data-turn="assistant"], [data-testid="user-message"], [data-testid="assistant-message"]',
   author: '[data-message-author-role="user"], [data-message-author-role="assistant"]',
-  sidebar: '#stage-slideover-sidebar, [data-testid="left-sidebar"], [data-testid="sidebar"], nav[aria-label="Chat history"], nav[aria-label="聊天记录"], nav[aria-label="聊天历史"], aside, nav',
+  sidebar: '#stage-slideover-sidebar, #stage-sidebar-tiny, [data-testid="left-sidebar"], [data-testid="sidebar"], nav[aria-label="Chat history"], nav[aria-label="聊天记录"], nav[aria-label="聊天历史"], aside, nav',
   history: '#history, [data-testid="history"], [data-testid="chat-history"]',
   chatLink: 'a[href*="/c/"]',
   messageId: '[data-message-id]',
@@ -73,9 +73,14 @@ function sidebarRegion(): { region: HTMLElement | null; mount: HTMLElement | nul
   const candidates = Array.from(document.querySelectorAll<HTMLElement>(SELECTORS.sidebar))
     .filter(sidebarOnScreen);
   // Prefer the outer, explicitly identified sidebar over nested nav elements.
-  const region = candidates.find((node) => node.matches('#stage-slideover-sidebar, [data-testid="left-sidebar"], [data-testid="sidebar"]'))
+  const explicitRegions = candidates.filter((node) => node.matches('#stage-slideover-sidebar, #stage-sidebar-tiny, [data-testid="left-sidebar"], [data-testid="sidebar"]'));
+  const region = explicitRegions.find((node) => node.getBoundingClientRect().width >= 130) ?? explicitRegions[0]
     ?? candidates.find((node) => Array.from(node.querySelectorAll<HTMLAnchorElement>(SELECTORS.chatLink)).some((link) => !ownNode(link) && conversationFromUrl(link.href)))
     ?? candidates.find((node) => /history|聊天|历史/i.test(node.getAttribute('aria-label') ?? ''))
+    ?? candidates.find((node) => {
+      const rect = node.getBoundingClientRect();
+      return rect.left >= 0 && rect.left <= 16 && rect.width >= 32 && rect.width < 130 && rect.height >= innerHeight / 2;
+    })
     ?? null;
   if (!region) return { region: null, mount: null };
   const explicit = region.matches(SELECTORS.history) ? region : region.querySelector<HTMLElement>(SELECTORS.history);
@@ -194,7 +199,7 @@ export function readPage(): PageSnapshot {
     || (!root.classList.contains('light') && !root.dataset.theme && root.style.colorScheme === 'dark');
   return {
     conversationId: current?.id ?? null, title, turns,
-    conversations: Array.from(conversations.values()), sidebar: mount, readingRoot: main,
+    conversations: Array.from(conversations.values()), sidebar: mount, sidebarRegion: region, readingRoot: main,
     scrollContainer: scrollContainer(main, turns[0]), dark,
   };
 }
@@ -243,6 +248,7 @@ export function observePage(callback: (page: PageSnapshot) => void): () => void 
   // A bounded debounce keeps a long streaming response updating continuously.
   const schedule = () => { if (!stopped && timer === undefined) timer = setTimeout(update, 100); };
   const observer = new MutationObserver((mutations) => { if (mutations.some(meaningfulMutation)) schedule(); });
+  const transitionEnded = (event: Event) => { if (!ownNode(event.target as Node)) schedule(); };
   observer.observe(document.documentElement, {
     subtree: true, childList: true, characterData: true, attributes: true,
     attributeFilter: ['data-message-id', 'data-message-author-role', 'data-turn', 'data-theme', 'data-color-mode', 'aria-hidden', 'hidden', 'class', 'style', 'href', 'title'],
@@ -250,6 +256,7 @@ export function observePage(callback: (page: PageSnapshot) => void): () => void 
   window.addEventListener('popstate', schedule);
   window.addEventListener('resize', schedule, { passive: true });
   document.addEventListener('visibilitychange', schedule);
+  document.addEventListener('transitionend', transitionEnded);
   const interval = setInterval(() => { if (location.href !== lastHref) schedule(); }, 700);
   return () => {
     stopped = true;
@@ -259,6 +266,7 @@ export function observePage(callback: (page: PageSnapshot) => void): () => void 
     window.removeEventListener('popstate', schedule);
     window.removeEventListener('resize', schedule);
     document.removeEventListener('visibilitychange', schedule);
+    document.removeEventListener('transitionend', transitionEnded);
   };
 }
 

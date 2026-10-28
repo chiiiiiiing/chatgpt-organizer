@@ -1,0 +1,56 @@
+:host {
+  all: initial;
+  --utility-bg: var(--bg-primary, var(--main-surface-primary, #fff));
+  --utility-ink: var(--text-primary, #171717);
+  --utility-line: var(--border-light, rgb(0 0 0 / 10%));
+  --utility-hover: var(--bg-secondary, #f5f5f5);
+  font: 12px/1.6 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+:host([data-theme="dark"]) {
+  --utility-bg: var(--bg-primary, var(--main-surface-primary, #212121));
+  --utility-ink: var(--text-primary, #ececec);
+  --utility-line: var(--border-light, rgb(255 255 255 / 12%));
+  --utility-hover: var(--bg-secondary, #303030);
+}
+[hidden] { display: none !important; }
+.launcher {
+  box-sizing: border-box;
+  position: fixed;
+  left: var(--launcher-left, 8px);
+  top: var(--launcher-top, 76px);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  color: var(--utility-ink);
+  background: var(--utility-bg);
+  border: 1px solid var(--utility-line);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #0000000d;
+}
+.launcher:hover { background: var(--utility-hover); }
+.launcher:focus-visible { outline: 2px solid var(--utility-ink); outline-offset: 3px; }
+.launcher svg { width: 20px; height: 20px; pointer-events: none; }
+.launcher[aria-expanded="true"] .folder-icon,
+.launcher[aria-expanded="false"] .close-icon { display: none; }
+.toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 130px;
+  z-index: 2147483646;
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: var(--utility-ink);
+  color: var(--utility-bg);
+  box-shadow: 0 4px 30px #0002;
+  max-width: min(580px, 85vw);
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.7;
+}
