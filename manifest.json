@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ChatGPT 整理空间",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "用文件夹整理对话，用问答时间轴回到重点。中文、本地优先，支持分类同步与备份。",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApmUF5K/U1dRZchf3aR73jyLSp3P46qrS4Is3NytADTff3rvqxMjT0jw7bbxvO0iEzgeO3/VY64sxQq0rfnJc3YMhsz3YzdgDptHrqSm8Aj6yfLBZhA2OZWodi9Mjg4rOa2s7q1PathAsYHr2dWkrEAW/ixJMMrodzG+OgSApWKfBk01KAHvHJeEhPLPrh15u8DPEB4LkC6Kv8Ztz1m/r2F38TWtwHbD7y39jesGydI6tEp5vLbNMHIXCGLBfxM9WXJeO8SpZAlrNBnuzScSQkwtiVB8ihQuolE0ZpKXcAiODberA1aytqtYoPScMUiebULAAe40UAkuy2y4/14UehwIDAQAB",
   "permissions": [
@@ -13,7 +13,13 @@
     "type": "module"
   },
   "action": {
-    "default_title": "整理空间 · 设置与备份"
+    "default_title": "整理空间 · 设置与备份",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
   },
   "options_ui": {
     "page": "settings.html",

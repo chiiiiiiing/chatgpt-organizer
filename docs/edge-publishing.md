@@ -1,16 +1,16 @@
 # 安装与发布到 Microsoft Edge 加载项商店
 
-本文针对 **ChatGPT 整理空间 0.1.2 预发布版**，官方说明核查日期：2026-10-28。GitHub 源码发布、开发者模式安装、Edge 商店上架是三个独立步骤；推送 GitHub 不会自动上架商店。
+本文针对 **ChatGPT 整理空间 0.1.3 预发布版**，官方说明核查日期：2026-10-28。GitHub 源码发布、开发者模式安装、Edge 商店上架是三个独立步骤；推送 GitHub 不会自动上架商店。
 
 ## 先在自己的 Edge 安装
 
-1. 从 [GitHub Releases](https://github.com/chiiiiiiing/chatgpt-organizer/releases) 下载 `chatgpt-organizer-0.1.2.zip` 并解压。选择这个构建附件，GitHub 自动生成的 `Source code.zip` 是源码，需要先构建。
+1. 从 [GitHub Releases](https://github.com/chiiiiiiing/chatgpt-organizer/releases) 下载 `chatgpt-organizer-0.1.3.zip` 并解压。选择这个构建附件，GitHub 自动生成的 `Source code.zip` 是源码，需要先构建。
 2. 在 Edge 地址栏输入 `edge://extensions`，打开“开发人员模式”。
 3. 点击“加载解压缩的扩展”，选择**直接包含 `manifest.json` 的文件夹**。不要选择 ZIP 文件，也不要选择外面多套的一层目录。
 4. 打开或刷新 `https://chatgpt.com/`，登录自己的 ChatGPT 账号。通过左侧“整理空间”管理文件夹，通过右侧时间轴回到问答。
 5. 点击浏览器工具栏中的插件图标，进入“设置与备份”。开始使用前了解同步范围；积累分类后定期导出 JSON 备份。
 
-本地已有源码时，执行 `npm ci`、`npm run package`，得到 `dist/` 和 `release/chatgpt-organizer-0.1.2.zip`。可以直接加载 `dist/`。更新开发者版时替换原位置的构建文件，在扩展管理页点击重新加载，再刷新 ChatGPT 页面。
+本地已有源码时，执行 `npm ci`、`npm run package`，得到 `dist/` 和 `release/chatgpt-organizer-0.1.3.zip`。可以直接加载 `dist/`。更新开发者版时替换原位置的构建文件，在扩展管理页点击重新加载，再刷新 ChatGPT 页面。
 
 界面沿用 ChatGPT 的浅色、深色配色，只增加整理功能。每个浏览器配置文件默认用于一个 ChatGPT 账号。更完整的使用与备份说明见 [README](../README.md)。
 
@@ -18,9 +18,9 @@
 
 当前源码有自动化验证，但真实登录态 ChatGPT 页面及 Edge 同账号双设备同步仍须实际验证，不能把测试夹具结果写成商店环境已经通过。按 [手动验证清单](manual-testing.md) 完成分类、刷新保存、长对话定位、流式回答、分支切换、深浅主题及窄窗口检查，再准备提交。
 
-- **扩展包**：上传 `release/chatgpt-organizer-0.1.2.zip`。ZIP 根目录应直接包含 `manifest.json`、`background.js`、`content.js`、`settings.html` 等构建文件，不上传源码包、`node_modules`、个人备份或密钥文件。
+- **扩展包**：上传 `release/chatgpt-organizer-0.1.3.zip`。ZIP 根目录应直接包含 `manifest.json`、`background.js`、`content.js`、`settings.html` 等构建文件，不上传源码包、`node_modules`、个人备份或密钥文件。
 - **公开隐私政策**：先确认 [PRIVACY.md](https://github.com/chiiiiiiing/chatgpt-organizer/blob/main/PRIVACY.md) 已推送且无须登录即可访问。仓库如为私有，需要把隐私政策另行放在公开网址。
-- **商店图片**：可使用 [logo128.png](store-assets/logo128.png)。Logo 必填，正方形，最低 128 × 128，推荐 300 × 300；截图可选，最多 6 张，尺寸为 640 × 480 或 1280 × 800；可选推广图为 440 × 280 和 1400 × 560。不要拉伸图片。[微软图片要求](https://learn.microsoft.com/en-us/microsoft-edge/extensions/publish/publish-extension#step-7-enter-store-listing-details-for-each-language)
+- **商店图片**：可使用 [logo300.png](store-assets/logo300.png)（也提供 [128 px 版本](store-assets/logo128.png)）。Logo 必填，正方形，最低 128 × 128，推荐 300 × 300；截图可选，最多 6 张，尺寸为 640 × 480 或 1280 × 800；可选推广图为 440 × 280 和 1400 × 560。不要拉伸图片。[微软图片要求](https://learn.microsoft.com/en-us/microsoft-edge/extensions/publish/publish-extension#step-7-enter-store-listing-details-for-each-language)
 - **真实演示截图**：用自己创建的无隐私示例对话展示文件夹、时间轴、搜索和备份。`docs/screenshots/` 是测试夹具页面的截图，不能直接当成真实 ChatGPT 使用效果或实测证据。使用本项目图标，不冒充 OpenAI 官方扩展。
 
 微软要求功能和商店描述相符、产品可供审核测试。依赖第三方登录时，需要提供测试方式；不能提供测试凭据的，应在审核备注中给出合理解释。不要把个人常用账号密码写入材料。[开发者政策](https://learn.microsoft.com/en-us/legal/microsoft-edge/extensions/developer-policies)

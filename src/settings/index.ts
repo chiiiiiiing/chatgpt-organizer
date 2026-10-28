@@ -3,8 +3,9 @@ import { request } from '../shared/client';
 import type { Backup, ImportPreview, Snapshot } from '../shared/types';
 
 const app = document.querySelector<HTMLElement>('#app')!;
+document.querySelector<HTMLLinkElement>('#extension-icon')!.href = chrome.runtime.getURL('icons/icon32.png');
 app.innerHTML = `
-<header class="topbar"><a href="https://chatgpt.com/" target="_blank" rel="noreferrer" class="brand"><span class="brand-icon">▤</span><span>整理空间<span class="brand-sub">FOR CHATGPT</span></span></a><span class="version">0.1.1 · 个人版</span></header>
+<header class="topbar"><a href="https://chatgpt.com/" target="_blank" rel="noreferrer" class="brand"><img class="brand-icon" src="${chrome.runtime.getURL('icons/icon128.png')}" width="38" height="38" alt=""><span>整理空间<span class="brand-sub">FOR CHATGPT</span></span></a><span class="version">${chrome.runtime.getManifest().version} · 个人版</span></header>
 <div class="heading"><div class="eyebrow">A LITTLE MORE ORDER</div><h1>让每次对话，都有归处。</h1><p>分类、回看、继续思考。你的对话仍在 ChatGPT，整理方式由你决定。</p></div>
 <section class="stats" aria-label="数据概览"><div><span id="folder-count">—</span><label>个文件夹</label></div><div><span id="filed-count">—</span><label>条已归类对话</label></div><div><span id="known-count">—</span><label>条已收录标题</label></div></section>
 <div class="grid"><section class="card"><div class="card-header"><span class="card-icon">⇄</span><div><h2>分类同步</h2><p>同一种浏览器，同一个浏览器账号</p></div><label class="switch"><input id="sync-enabled" type="checkbox" aria-label="启用浏览器账号同步"><span></span></label></div>

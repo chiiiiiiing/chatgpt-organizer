@@ -1,64 +1,58 @@
 {
   "date": "2026-10-28",
   "timezone": "Asia/Shanghai",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "extensionId": "agkjfdlffbijhaogmnekcfpkddnfihib",
-  "change": "Keep the compact organizer launcher and floating panel outside the collapsed native sidebar",
+  "change": "Install generated interwoven-knot and folder logo in toolbar, extension metadata, settings header and favicon",
   "build": {
     "typescript": "passed",
     "vite": "passed"
   },
-  "unitTests": {
-    "passed": 34,
-    "total": 34
+  "assetVerification": {
+    "sizes": [
+      16,
+      32,
+      48,
+      128
+    ],
+    "pngDimensions": "passed",
+    "manifestAndToolbarMapping": "passed",
+    "packagedFilesMatchSources": "passed",
+    "contentAndBackgroundHashesMatchV012": true,
+    "settingsScreenshot": "visually inspected"
   },
-  "regressionReproducedOn": "0.1.1: utility overlay intercepted clicks on the native new-chat button",
   "browserTests": [
-    {
-      "browser": "Chrome for Testing",
-      "version": "156.0.8078.4",
-      "extensionId": "agkjfdlffbijhaogmnekcfpkddnfihib",
-      "fixture": true,
-      "scenariosPassed": 2,
-      "scenarios": [
-        "native drag, nested folders, themes and narrow layout",
-        "collapsed sidebar, native button clicks, width transitions, viewport bounds and normal composer access"
-      ]
-    },
     {
       "browser": "Microsoft Edge",
       "version": "156.0.4314.42",
       "extensionId": "agkjfdlffbijhaogmnekcfpkddnfihib",
       "fixture": true,
-      "scenariosPassed": 2,
-      "scenarios": [
-        "native drag, nested folders, themes and narrow layout",
-        "collapsed sidebar, native button clicks, width transitions, viewport bounds and normal composer access"
-      ]
+      "scenariosPassed": 1,
+      "scenario": "native drag, nested folders, themes, narrow layout and settings page with new logo"
     }
   ],
-  "baselineVerification": "verification-v0.1.0.json",
+  "baselineVerification": "verification-v0.1.2.json",
   "notVerified": [
     "Live authenticated ChatGPT DOM",
     "Chrome account sync across two devices",
     "Edge account sync across two devices"
   ],
   "archive": {
-    "path": "release/chatgpt-organizer-0.1.2.zip",
-    "sizeBytes": 34994,
-    "sha256": "7ef166b9d39c442d04cd456026697167cd1ee614d0b0a1344e60479826d5a34e",
+    "path": "release/chatgpt-organizer-0.1.3.zip",
+    "sizeBytes": 61470,
+    "sha256": "4fc9dae525abe0edf45d500741a3e9f4a500751cd315fa57dace41bea072be4a",
     "integrity": "passed"
   },
   "buildFiles": {
-    "assets/settings-C2iHGiTW.css": "8fb9b3b9b271a4ae7a119b3b9acc17ee0f66ebdd322683030bdaae60e38dca24",
+    "assets/settings-BwjR6lkE.css": "9161a7cf8ff80093634be6b211022601cf14e3de63539325406661b3e23aaf6d",
     "background.js": "d25824991f57faf9dcc80f0763af055774bf651d68f5fcae3a8de13f2be29ccc",
     "content.js": "a4d5730b625a40aee202a3c8f2ed5737fad650f974bfd287c2dd0588281d753b",
-    "icons/icon128.png": "5ead81ad75f5612a77294815747bf8c4ed2f9882585109533d593397e74c0ec5",
-    "icons/icon16.png": "dc722e365ef05baae09620484e6771b6f7a9d36ebf49ffeaf5037456bd3c9674",
-    "icons/icon32.png": "125158c633b432b815f40e2eeada181f5b6f855682ec904cdc9611b75721a293",
-    "icons/icon48.png": "9837ddaddab05ec951a2cba02c72563c55b6750898f319498b4d1642afaa741a",
-    "manifest.json": "5c1c3760b8b6df39e33c3f8256c06f7fbe58a6fc6126e377c85ebde9d629f230",
-    "settings.html": "8eea9c6fcb2a085b68b6f2f8c467fdc202c6b2d0bb3709e51906c2ad44cf0bd9",
-    "settings.js": "420a112eda314bedaa4856e0afeabe1b742e8fc5431e6f9c42b8a4b1dd384fcc"
+    "icons/icon128.png": "3fec877e90ef2346ac7b4fb7877400fcc75301a0dc52024ade81cc5f38d13264",
+    "icons/icon16.png": "bf6fcaa2c77b57302ff3e90cfcc18d4c5b944c6c05a2c8988df7a704400227d0",
+    "icons/icon32.png": "fdab3ad052f77d51524092d74586957b37105a2fda404c209d44c3fb2066c1d4",
+    "icons/icon48.png": "23c793e9b8e09c1af7b491b9646b331adeb6a4aac50218bdb9645041bb82e16d",
+    "manifest.json": "1ed8a5d3938f636d479d17ce286eeb72e57b0beb2d9faecb78002ea29cfbb653",
+    "settings.html": "d88c7aa6001bf93d61aff440f11c4cf543a024e70b7f7bce83eece8bc18a6de9",
+    "settings.js": "088b33ef842a4dc1701cd7f4ab7517c963435d5b9538d94e6ebac1db05ca85a3"
   }
 }

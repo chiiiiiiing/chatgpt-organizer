@@ -1,22 +1,24 @@
 # ChatGPT 整理空间
 
-**v0.1.2 · Chrome / Edge 桌面浏览器扩展**
+<img src="assets/icons/icon128.png" alt="ChatGPT 整理空间图标" width="72" height="72">
+
+**v0.1.3 · Chrome / Edge 桌面浏览器扩展**
 
 用文件夹整理对话，用右侧时间轴回到某轮问答。中文界面，沿用 ChatGPT 的原生配色与浅色或深色主题，适合在一个浏览器配置中使用单一 ChatGPT 账号。
 
 这是独立实现的个人版插件，交互参考 [Voyager](https://voyager.nagi.fun/en/guide/timeline.html)，与 OpenAI、ChatGPT 或 Voyager 官方无隶属关系。
 
-[查看界面预览与验证记录](docs/verification.md)。核心版本已完成 34 项单元测试与 Chrome 测试版、Edge 各 4 项本地模拟页面场景；v0.1.2 修复收起侧栏时的入口遮挡，已通过 34 项单元测试及 Chrome 测试版、Edge 各 2 项界面回归场景。真实登录态网页和双设备账号同步尚未验证。
+[查看界面预览与验证记录](docs/verification.md)。核心版本已完成 34 项单元测试与 Chrome 测试版、Edge 各 4 项本地模拟页面场景；v0.1.2 的侧栏遮挡修复已通过 34 项单元测试及 Chrome 测试版、Edge 各 2 项界面回归场景；v0.1.3 接入新版图标。真实登录态网页和双设备账号同步尚未验证。
 
 ## 安装
 
-从 GitHub 获取可安装版本：打开 [Releases](https://github.com/chiiiiiiing/chatgpt-organizer/releases/tag/v0.1.2)，在 **Assets** 中下载 `chatgpt-organizer-0.1.2.zip`。GitHub 自动提供的 `Source code (zip)` 只是源码，需要自行构建后才能安装。
+从 GitHub 获取可安装版本：打开 [Releases](https://github.com/chiiiiiiing/chatgpt-organizer/releases/tag/v0.1.3)，在 **Assets** 中下载 `chatgpt-organizer-0.1.3.zip`。GitHub 自动提供的 `Source code (zip)` 只是源码，需要自行构建后才能安装。
 
 [隐私说明](PRIVACY.md) · [Edge 商店上架指南与可复制填写内容](docs/edge-publishing.md)
 
 ### 使用已经构建好的文件
 
-1. 如果拿到的是 `release/chatgpt-organizer-0.1.2.zip`，先解压到一个准备长期保留的文件夹。不要直接选择 ZIP。
+1. 如果拿到的是 `release/chatgpt-organizer-0.1.3.zip`，先解压到一个准备长期保留的文件夹。不要直接选择 ZIP。
 2. Chrome 打开 `chrome://extensions`；Edge 打开 `edge://extensions`。
 3. 打开页面上的「开发者模式」，选择「加载已解压的扩展程序」。
 4. 选择包含 `manifest.json` 的文件夹：本项目直接选择 `dist`；ZIP 则选择解压后包含该文件的目录。
@@ -99,6 +101,10 @@ Chrome 扩展同步区的限制约为 **100 KB 总量、8 KB 单条记录、512 
 - **已归类聊天失效**：插件保存的是原聊天的引用；原聊天被删除或当前账号无权访问时，插件不会恢复其正文。
 
 扩展只匹配 ChatGPT 网站，不使用自建服务器，不调用付费 API。浏览器账号同步使用浏览器自己的服务。
+
+## 图标资源
+
+新版图标将交织结形图案与文件夹角标组合，使用黑白灰配色。高清原图与内置 imagegen 的[生成提示词](assets/branding/prompt.txt)位于 `assets/branding/`，16 / 32 / 48 / 128 px 安装图标位于 `assets/icons/`；构建会复制这些图标。商店可使用[300 px 图标](docs/store-assets/logo300.png)。
 
 ## 开发与验证
 
